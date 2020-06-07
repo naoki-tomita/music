@@ -1,0 +1,26 @@
+type Artist {
+  id: Int!
+  name: String!
+  albums: [Album]!
+  musics: [Music]!
+}
+
+type Music {
+  id: Int!
+  name: String!
+  artist: Artist
+  album: Album
+}
+
+type Album {
+  id: Int!
+  name: String!
+  musics: [Music]!
+  artist: Artist!
+}
+
+type Query {
+  musics: [Music]!
+  albums: [Album]!
+  artists: [Artist]!
+}
