@@ -1,0 +1,1 @@
+{"version":3,"file":"SQLite.d.ts","sourceRoot":"","sources":["../../../../src/scripts/drivers/SQLite.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,IAAI,SAAS,EAAE,MAAM,SAAS,CAAC;AAGhD,qBACa,QAAQ;IACnB,EAAE,EAAE,SAAS,CAAC;;IAKd,IAAI,CAAC,GAAG,EAAE,MAAM;IAKhB,GAAG,CAAC,CAAC,EAAE,GAAG,EAAE,MAAM;IAIlB,GAAG,CAAC,CAAC,EAAE,GAAG,EAAE,MAAM;CAGnB"}

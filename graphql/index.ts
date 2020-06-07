@@ -25,7 +25,7 @@ class GraphQl {
   artist!: Artist;
 }
 
-async function main() {
+export async function listen(port: number) {
   const graphql = new GraphQl();
   const resolvers: Resolvers = {
     Query: {
@@ -76,7 +76,5 @@ async function main() {
 
   const app = express();
   server.applyMiddleware({ app, cors: true });
-  app.listen(8080);
+  app.listen(port);
 }
-
-main();
