@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "electron": "8",
+    "electron-rebuild": "^1.11.0",
+    "graphql": "../graphql/",
+    "rebuild": "electron-rebuild",
+    "sqlite3": "^4.2.0"
+  },
+  "name": "app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "license": "MIT"
+}
