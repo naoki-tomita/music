@@ -11,11 +11,6 @@ import { binding } from "automated-omusubi";
 
 const EXTS = ["mp3", "m4a", "mp4"];
 
-interface MP3Metadata {
-  name: string;
-  path: string;
-}
-
 function readdirAsync(path: string) {
   return new Promise<string[]>((ok, ng) => readdir(path, (err, files) => (err ? ng(err) : ok(files))));
 }
@@ -59,15 +54,16 @@ class DB {
       createTable<MusicEntity>("music").ifNotExist()
         .column("id").type("INTEGER").primaryKey().autoIncrement().notNull().unique()
         .column("name").type("TEXT").notNull()
-        .column("album_id").type("INTEGER")
-        .column("artist_id").type("INTEGER")
+        .column("filePath").type("TEXT")
+        .column("albumId").type("INTEGER")
+        .column("artistId").type("INTEGER")
         .build()
     );
     await this.db.exec(
       createTable<AlbumEntity>("album").ifNotExist()
         .column("id").type("INTEGER").primaryKey().autoIncrement().notNull().unique()
         .column("name").type("TEXT").notNull()
-        .column("artist_id").type("INTEGER")
+        .column("artistId").type("INTEGER")
         .build()
     );
     await this.db.exec(
@@ -94,7 +90,7 @@ class DB {
   async findAlbumByNameAndArtistId(name: string, artistId?: number): Promise<AlbumEntity | undefined> {
     return (await this.db.get<AlbumEntity>(select("*").from<AlbumEntity>("album")
       .where("name").equal(name)
-      .and("artist_id").equal(artistId)
+      .and("artistId").equal(artistId)
       .build()));
   }
 
@@ -104,33 +100,22 @@ class DB {
       return album.id;
     }
     await this.db.exec(insertInto<AlbumEntity>("album")
-      .keys("name", "artist_id")
+      .keys("name", "artistId")
       .values(name, artistId)
       .build());
     return (await this.findAlbumByNameAndArtistId(name, artistId))!.id;
   }
 
-  async createMusicIfNotExist(name: string, albumId?: number, artistId?: number) {
+  async createMusicIfNotExist(name: string, filePath: string, albumId?: number, artistId?: number) {
     let findBy = select("*").from<MusicEntity>("music")
-      .where("name").equal(name)
-    if (albumId != null) {
-      findBy = findBy.and("album_id").equal(albumId);
-    } else {
-      findBy = findBy.and("album_id").isNull();
-    }
-    if (artistId != null) {
-      findBy = findBy.and("artist_id").equal(artistId)
-    } else {
-      findBy = findBy.and("artist_id").isNull();
-    }
+      .where("filePath").equal(filePath);
     const music = await this.db.get(findBy.build());
     if (music) {
       return;
     }
 
-    const keys = ["name", artistId != null ? "artist_id": undefined, albumId != null? "album_id": undefined].filter(isString) as any[];
-    const values = [name, artistId != null ? artistId: undefined, albumId != null? albumId: undefined].filter(it => !isNullish(it)) as any[]
-    console.log(keys, values)
+    const keys = ["name", "filePath", artistId != null ? "artistId": undefined, albumId != null? "albumId": undefined].filter(isString) as any[];
+    const values = [name, filePath, artistId != null ? artistId: undefined, albumId != null? albumId: undefined].filter(it => !isNullish(it)) as any[]
     await this.db.exec(insertInto<MusicEntity>("music")
       .keys(...keys)
       .values(...values)
@@ -157,7 +142,7 @@ async function main() {
           if (metadata.album) {
             albumId = await db.createAlbumIfNotExist(metadata.album, artistId);
           }
-          await db.createMusicIfNotExist(metadata.title || basename(file, extname(file)), albumId, artistId);
+          await db.createMusicIfNotExist(metadata.title || basename(file, extname(file)), file, albumId, artistId);
         }
       }
     } catch (e) {

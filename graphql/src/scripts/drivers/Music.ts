@@ -6,8 +6,9 @@ import { Music } from "../generated/graphql";
 export interface MusicEntity {
   id: number;
   name: string;
-  album_id: number;
-  artist_id: number;
+  filePath: string;
+  albumId: number;
+  artistId: number;
 }
 
 @named
@@ -24,14 +25,14 @@ export class MusicDriver {
   findByAlbumId(id: number): Promise<MusicEntity[]> {
     return this.database.all<MusicEntity>(
       select("*").from<MusicEntity>("music")
-        .where("album_id").equal(id).build()
+        .where("albumId").equal(id).build()
     );
   }
 
   findByArtistId(id: number): Promise<MusicEntity[]> {
     return this.database.all<MusicEntity>(
       select("*").from<MusicEntity>("music")
-        .where("artist_id").equal(id).build()
+        .where("artistId").equal(id).build()
     );
   }
 }

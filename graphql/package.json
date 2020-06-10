@@ -1,8 +1,11 @@
 {
-  "name": "graphql",
+  "name": "music-graphql-server",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
+  "bin": {
+    "batch": "./dist/tools/batch.js"
+  },
   "dependencies": {
     "@types/express": "^4.17.6",
     "@types/sqlite3": "^3.1.6",
@@ -27,6 +30,9 @@
   "scripts": {
     "generate": "graphql-codegen --config codegen.json",
     "batch": "ts-node tools/batch.ts",
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "prebuild": "rm -rf dist",
+    "build": "tsc && echo \"#!/usr/bin/env node\n$(cat dist/tools/batch.js)\" > dist/tools/batch.js",
+    "postbuild": "cp -r src/graphql dist/src"
   }
 }

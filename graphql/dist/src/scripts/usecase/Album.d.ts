@@ -7,6 +7,6 @@ export declare class Album {
     album: AlbumDriver;
     getAll(): Promise<import("../drivers/Album").AlbumEntity[]>;
     getAlbum(id: number): Promise<import("../drivers/Album").AlbumEntity | undefined>;
-    findByArtistId(artistId: number): Promise<unknown>;
+    findByArtistId(artistId: number): Promise<unknown[]>;
 }
 //# sourceMappingURL=Album.d.ts.map

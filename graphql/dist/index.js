@@ -52,6 +52,7 @@ exports.listen = void 0;
 var apollo_server_express_1 = require("apollo-server-express");
 var express_1 = __importDefault(require("express"));
 var fs_1 = require("fs");
+var path_1 = require("path");
 var automated_omusubi_1 = require("automated-omusubi");
 var Music_1 = require("./src/scripts/usecase/Music");
 var Album_1 = require("./src/scripts/usecase/Album");
@@ -124,7 +125,7 @@ function listen(port) {
                                         switch (_a.label) {
                                             case 0:
                                                 entity = music;
-                                                return [4 /*yield*/, graphql.album.getAlbum(entity.album_id)];
+                                                return [4 /*yield*/, graphql.album.getAlbum(entity.albumId)];
                                             case 1: return [2 /*return*/, _a.sent()];
                                         }
                                     });
@@ -137,7 +138,7 @@ function listen(port) {
                                         switch (_a.label) {
                                             case 0:
                                                 entity = music;
-                                                return [4 /*yield*/, graphql.artist.getArtist(entity.artist_id)];
+                                                return [4 /*yield*/, graphql.artist.getArtist(entity.artistId)];
                                             case 1: return [2 /*return*/, _a.sent()];
                                         }
                                     });
@@ -152,7 +153,7 @@ function listen(port) {
                                         switch (_a.label) {
                                             case 0:
                                                 entity = album;
-                                                return [4 /*yield*/, graphql.artist.getArtist(entity.artist_id)];
+                                                return [4 /*yield*/, graphql.artist.getArtist(entity.artistId)];
                                             case 1: return [2 /*return*/, _a.sent()];
                                         }
                                     });
@@ -202,7 +203,7 @@ function listen(port) {
                         }
                     };
                     _a = apollo_server_express_1.gql;
-                    return [4 /*yield*/, readFileAsync("src/graphql/schema.graphql")];
+                    return [4 /*yield*/, readFileAsync(path_1.join(__dirname, "src/graphql/schema.graphql"))];
                 case 1:
                     typeDefs = _a.apply(void 0, [_b.sent()]);
                     server = new apollo_server_express_1.ApolloServer({ typeDefs: typeDefs, resolvers: resolvers });

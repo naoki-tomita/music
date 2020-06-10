@@ -1,6 +1,7 @@
 import { ApolloServer, gql } from "apollo-server-express";
 import express from "express";
 import { readFile } from "fs";
+import { join } from "path";
 import { Resolvers } from "./src/scripts/generated/graphql";
 import { binding } from "automated-omusubi";
 import { Music } from "./src/scripts/usecase/Music";
@@ -42,17 +43,17 @@ export async function listen(port: number) {
     Music: {
       async album(music) {
         const entity = music as MusicEntity;
-        return await graphql.album.getAlbum(entity.album_id) as any;
+        return await graphql.album.getAlbum(entity.albumId) as any;
       },
       async artist(music) {
         const entity = music as MusicEntity;
-        return await graphql.artist.getArtist(entity.artist_id) as any;
+        return await graphql.artist.getArtist(entity.artistId) as any;
       }
     },
     Album: {
       async artist(album) {
         const entity = album as unknown as AlbumEntity;
-        return await graphql.artist.getArtist(entity.artist_id) as any;
+        return await graphql.artist.getArtist(entity.artistId) as any;
       },
       async musics(album) {
         const entity = album as unknown as AlbumEntity;
@@ -71,9 +72,8 @@ export async function listen(port: number) {
     }
   }
 
-  const typeDefs = gql(await readFileAsync("src/graphql/schema.graphql"))
+  const typeDefs = gql(await readFileAsync(join(__dirname, "src/graphql/schema.graphql")))
   const server = new ApolloServer({ typeDefs, resolvers: resolvers as any });
-
   const app = express();
   server.applyMiddleware({ app, cors: true });
   app.listen(port);

@@ -19,6 +19,7 @@ export declare type Music = {
     __typename?: 'Music';
     id: Scalars['Int'];
     name: Scalars['String'];
+    filePath: Scalars['String'];
     artist?: Maybe<Artist>;
     album?: Maybe<Album>;
 };
@@ -97,6 +98,7 @@ export declare type ArtistResolvers<ContextType = any, ParentType extends Resolv
 export declare type MusicResolvers<ContextType = any, ParentType extends ResolversParentTypes['Music'] = ResolversParentTypes['Music']> = {
     id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
     name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+    filePath?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
     artist?: Resolver<Maybe<ResolversTypes['Artist']>, ParentType, ContextType>;
     album?: Resolver<Maybe<ResolversTypes['Album']>, ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType>;

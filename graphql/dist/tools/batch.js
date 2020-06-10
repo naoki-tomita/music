@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -130,15 +131,16 @@ var DB = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.db.exec(sql_query_factory_1.createTable("music").ifNotExist()
                             .column("id").type("INTEGER").primaryKey().autoIncrement().notNull().unique()
                             .column("name").type("TEXT").notNull()
-                            .column("album_id").type("INTEGER")
-                            .column("artist_id").type("INTEGER")
+                            .column("filePath").type("TEXT")
+                            .column("albumId").type("INTEGER")
+                            .column("artistId").type("INTEGER")
                             .build())];
                     case 1:
                         _a.sent();
                         return [4 /*yield*/, this.db.exec(sql_query_factory_1.createTable("album").ifNotExist()
                                 .column("id").type("INTEGER").primaryKey().autoIncrement().notNull().unique()
                                 .column("name").type("TEXT").notNull()
-                                .column("artist_id").type("INTEGER")
+                                .column("artistId").type("INTEGER")
                                 .build())];
                     case 2:
                         _a.sent();
@@ -189,7 +191,7 @@ var DB = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.db.get(sql_query_factory_1.select("*").from("album")
                             .where("name").equal(name)
-                            .and("artist_id").equal(artistId)
+                            .and("artistId").equal(artistId)
                             .build())];
                     case 1: return [2 /*return*/, (_a.sent())];
                 }
@@ -208,7 +210,7 @@ var DB = /** @class */ (function () {
                             return [2 /*return*/, album.id];
                         }
                         return [4 /*yield*/, this.db.exec(sql_query_factory_1.insertInto("album")
-                                .keys("name", "artist_id")
+                                .keys("name", "artistId")
                                 .values(name, artistId)
                                 .build())];
                     case 2:
@@ -219,7 +221,7 @@ var DB = /** @class */ (function () {
             });
         });
     };
-    DB.prototype.createMusicIfNotExist = function (name, albumId, artistId) {
+    DB.prototype.createMusicIfNotExist = function (name, filePath, albumId, artistId) {
         return __awaiter(this, void 0, void 0, function () {
             var findBy, music, keys, values;
             var _a, _b;
@@ -227,28 +229,15 @@ var DB = /** @class */ (function () {
                 switch (_c.label) {
                     case 0:
                         findBy = sql_query_factory_1.select("*").from("music")
-                            .where("name").equal(name);
-                        if (albumId != null) {
-                            findBy = findBy.and("album_id").equal(albumId);
-                        }
-                        else {
-                            findBy = findBy.and("album_id").isNull();
-                        }
-                        if (artistId != null) {
-                            findBy = findBy.and("artist_id").equal(artistId);
-                        }
-                        else {
-                            findBy = findBy.and("artist_id").isNull();
-                        }
+                            .where("filePath").equal(filePath);
                         return [4 /*yield*/, this.db.get(findBy.build())];
                     case 1:
                         music = _c.sent();
                         if (music) {
                             return [2 /*return*/];
                         }
-                        keys = ["name", artistId != null ? "artist_id" : undefined, albumId != null ? "album_id" : undefined].filter(isString);
-                        values = [name, artistId != null ? artistId : undefined, albumId != null ? albumId : undefined].filter(function (it) { return !isNullish(it); });
-                        console.log(keys, values);
+                        keys = ["name", "filePath", artistId != null ? "artistId" : undefined, albumId != null ? "albumId" : undefined].filter(isString);
+                        values = [name, filePath, artistId != null ? artistId : undefined, albumId != null ? albumId : undefined].filter(function (it) { return !isNullish(it); });
                         return [4 /*yield*/, this.db.exec((_a = (_b = sql_query_factory_1.insertInto("music")).keys.apply(_b, keys)).values.apply(_a, values).build())];
                     case 2:
                         _c.sent();
@@ -307,7 +296,7 @@ function main() {
                 case 9:
                     albumId = _d.sent();
                     _d.label = 10;
-                case 10: return [4 /*yield*/, db.createMusicIfNotExist(metadata.title || path_1.basename(file, path_1.extname(file)), albumId, artistId)];
+                case 10: return [4 /*yield*/, db.createMusicIfNotExist(metadata.title || path_1.basename(file, path_1.extname(file)), file, albumId, artistId)];
                 case 11:
                     _d.sent();
                     _d.label = 12;

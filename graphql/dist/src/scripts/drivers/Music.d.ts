@@ -2,8 +2,9 @@ import { Database } from "./SQLite";
 export interface MusicEntity {
     id: number;
     name: string;
-    album_id: number;
-    artist_id: number;
+    filePath: string;
+    albumId: number;
+    artistId: number;
 }
 export declare class MusicDriver {
     database: Database;

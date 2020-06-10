@@ -23,7 +23,7 @@ var AlbumDriver = /** @class */ (function () {
         return this.database.get(sql_query_factory_1.select("*").from("album").where("id").equal(id).build());
     };
     AlbumDriver.prototype.findByArtistId = function (id) {
-        return this.database.get(sql_query_factory_1.select("*").from("album").where("artist_id").equal(id).build());
+        return this.database.all(sql_query_factory_1.select("*").from("album").where("artistId").equal(id).build());
     };
     __decorate([
         automated_omusubi_1.binding,

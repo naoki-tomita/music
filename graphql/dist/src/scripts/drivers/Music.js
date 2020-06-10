@@ -21,11 +21,11 @@ var MusicDriver = /** @class */ (function () {
     };
     MusicDriver.prototype.findByAlbumId = function (id) {
         return this.database.all(sql_query_factory_1.select("*").from("music")
-            .where("album_id").equal(id).build());
+            .where("albumId").equal(id).build());
     };
     MusicDriver.prototype.findByArtistId = function (id) {
         return this.database.all(sql_query_factory_1.select("*").from("music")
-            .where("artist_id").equal(id).build());
+            .where("artistId").equal(id).build());
     };
     __decorate([
         automated_omusubi_1.binding,

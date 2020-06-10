@@ -6,7 +6,7 @@ import { Album } from "../generated/graphql";
 export interface AlbumEntity {
   id: number;
   name: string;
-  artist_id: number;
+  artistId: number;
 }
 
 @named
@@ -27,8 +27,8 @@ export class AlbumDriver {
   }
 
   findByArtistId(id: number) {
-    return this.database.get(
-      select("*").from<AlbumEntity>("album").where("artist_id").equal(id).build()
+    return this.database.all(
+      select("*").from<AlbumEntity>("album").where("artistId").equal(id).build()
     );
   }
 }
