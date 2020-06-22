@@ -4,6 +4,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 
 import { App } from "./App";
+import { StoreProvider } from "./Actions";
 
 const client = new ApolloClient({ uri: "http://localhost:8080/graphql" });
 
@@ -12,7 +13,9 @@ document.body.append(app);
 
 render(
   <ApolloProvider client={client}>
-    <App />
+    <StoreProvider>
+      <App />
+    </StoreProvider>
   </ApolloProvider>,
   app
 );
