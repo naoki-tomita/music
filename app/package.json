@@ -1,8 +1,12 @@
 {
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
+    "@fortawesome/fontawesome-svg-core": "^1.2.29",
+    "@fortawesome/free-solid-svg-icons": "^5.13.1",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@types/react": "^16.9.36",
     "@types/react-dom": "^16.9.8",
+    "@types/styled-components": "^5.1.0",
     "apollo-boost": "^0.4.9",
     "electron": "9",
     "electron-rebuild": "^1.11.0",
@@ -11,6 +15,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "sqlite3": "^4.2.0",
+    "styled-components": "^5.1.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   },

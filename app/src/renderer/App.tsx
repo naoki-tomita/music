@@ -2,119 +2,135 @@ import * as React from "react";
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { DisplayMode } from "./Actions/App";
-import { useContext } from "./Actions";
 import { usePlayer } from "./Actions/Player";
+import { useApp } from "./Actions/App";
+import { faPlay, faBackward, faStop, faPause, faForward, faMusic, faImages, faMale } from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { IconButton, Nav, NavItem, ShadowInset, Dropdown, ProgressBar } from "./Neumophism";
+import { classNames, secondToMinuteString } from "./Utils";
+import styled from "styled-components";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "@apollo/react-hooks";
+
+
 const { useState } = React;
+
+const Grid = styled.div<{ width: number }>`
+        display: grid;
+        grid-template-areas: "a a a"
+                             "b sliderh c"
+                             "footer footer footer";
+        grid-template-rows: 96px
+                            1fr
+                            16px;
+        grid-template-columns: ${({ width }) => width}px 1px 1fr;
+        height: 100vh;
+`;
 
 export const App: React.FC = () => {
   const [state, setState] = useState<{
     width: number;
-    height: number;
     dragHorizontal: boolean;
-    dragVertical: boolean;
-    x: number;
-    y: number;
   }>({
-    width: 120,
-    height: 40,
+    width: 200,
     dragHorizontal: false,
-    dragVertical: false,
-    x: -1,
-    y: -1,
   });
 
-  function dragStart(vertical: boolean) {
-    return function(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-      console.log(vertical);
-      setState({
-        ...state,
-        x: e.clientX,
-        y: e.clientY,
-        dragHorizontal: !vertical,
-        dragVertical: vertical
-      });
-    }
+  function dragStart() {
+    setState({
+      ...state,
+      dragHorizontal: true,
+    });
   }
 
   function onDrag(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     setState({
       ...state,
-      x: e.clientX,
-      y: e.clientY,
-      width: Math.max(state.width - (state.dragHorizontal ? (state.x - e.clientX) : 0), 80),
-      height: Math.max(state.height - (state.dragVertical ? (state.y - e.clientY) : 0), 20),
+      width: Math.max(state.dragHorizontal ? e.clientX : state.width, 80),
     });
   }
 
   function dragEnd() {
-    setState({ ...state, dragHorizontal: false, dragVertical: false })
+    setState({ ...state, dragHorizontal: false })
   }
 
   return (
     <>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateAreas: `"a a a"
-                            "sliderv sliderv sliderv"
-                            "b sliderh c"`,
-        gridTemplateRows: `${state.height}px
-                          3px
-                          1fr`,
-        gridTemplateColumns: `${state.width}px 3px 1fr`,
-        height: "100vh",
-      }}
-      onMouseMove={state.dragHorizontal || state.dragVertical ? onDrag : undefined}
-      onMouseUp={state.dragHorizontal || state.dragVertical ? dragEnd : undefined}
+    <Grid
+      width={state.width}
+      onMouseMove={state.dragHorizontal ? onDrag : undefined}
+      onMouseUp={state.dragHorizontal ? dragEnd : undefined}
     >
       <div style={{ gridArea: "a" }}><Player /></div>
-      <div onMouseDown={dragStart(true)} style={{ gridArea: "sliderv", backgroundColor: "#eee", cursor: "row-resize" }}></div>
       <div style={{ gridArea: "b" }}><Sidebar /></div>
-      <div onMouseDown={dragStart(false)} style={{ gridArea: "sliderh", backgroundColor: "#eee", cursor: "col-resize" }}></div>
-      <div style={{ gridArea: "c", overflow: "scroll" }}><Main /></div>
-    </div>
+      <div className="slider-wrapper">
+        <div onMouseDown={dragStart} className="slider"></div>
+        <div onMouseDown={dragStart} className="slider-highlight"></div>
+      </div>
+      <ShadowInset style={{ gridArea: "c", overflow: "scroll", position: "relative", top: 0, bottom: 0, margin: "0 16px" }}>
+        <ApolloProvider client={client}>
+          <Main />
+        </ApolloProvider>
+      </ShadowInset>
+    </Grid>
     </>
   );
 }
 
 const Sidebar: React.FC = () => {
-  const { app: { displayMode, setDisplayMode } } = useContext();
+  const { displayMode, setDisplayMode } = useApp();
 
-  const Link: React.FC<{ type: DisplayMode }> = ({ type, children }) => {
-    return type === displayMode
-      ? <li>{children}</li>
-      : <li><a href="#" onClick={(e) => (console.log(e), setDisplayMode(type))}>{children}</a></li>
+  const Link: React.FC<{ type: DisplayMode, label: string, icon: IconProp }> = ({ type, label, icon }) => {
+    return <NavItem label={label} active={type === displayMode} onClick={() => (setDisplayMode(type))} icon={icon}/>
   }
 
   return (
-    <ul style={{ userSelect: "none" }}>
-      <Link type="music">Music</Link>
-      <Link type="artist">Artist</Link>
-      <Link type="album">Album</Link>
-    </ul>
+    <div style={{ padding: "0 16px" }}>
+      <Nav>
+        <Link type="music" icon={faMusic} label="Music" />
+        <Link type="artist" icon={faMale} label="Artist" />
+        <Link type="album" icon={faImages} label="Album" />
+      </Nav>
+    </div>
   );
 }
 
 const Player: React.FC = () => {
-  const { player: { next, prev, play, stop, pause, playing, hasNext, hasPrev, playlist } } = useContext();
+  const {
+    next, prev, play, stop, pause, jump,
+    playing, hasNext, hasPrev, current, afterSongs, playlist, duration, currentTime
+  } = usePlayer();
   return (
-    <div style={{ display: "flex", justifyContent: "center", userSelect: "none" }}>
-      <div>
-        <button disabled={!hasPrev} onClick={prev}>{"<<"}</button>
-        <button onClick={stop}>{"■"}</button>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: "100%", userSelect: "none", padding: 16 }}>
+      <div style={{ flex: 1, minWidth: 216 }}>
+        <IconButton style={{ marginRight: 16 }} disabled={!hasPrev} onClick={prev} icon={faBackward} />
+        <IconButton style={{ marginRight: 16 }} onClick={stop} icon={faStop} />
         {playing
-          ? <button onClick={pause}>{"||"}</button>
-          : <button onClick={play}>{"→"}</button>}
-        <button disabled={!hasNext} onClick={next}>{">>"}</button>
+          ? <IconButton style={{ marginRight: 16 }} onClick={pause} icon={faPause} />
+          : <IconButton style={{ marginRight: 16 }} onClick={play} icon={faPlay} />}
+        <IconButton disabled={!hasNext} onClick={next} icon={faForward} />
+      </div>
+      <ShadowInset style={{ padding: 16, height: 64, width: 420, marginRight: 16 }}>
+        <ProgressBar label={current ? `Now Playing - ${current.name}`: "-"} progress={secondToMinuteString(currentTime)} percentage={(currentTime/duration)*100} />
+      </ShadowInset>
+      <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+        <Dropdown
+          items={current ? [
+            ...[({ label: `Now Playing - ${current.name}`, id: current.id })],
+            null,
+            ...afterSongs.map(it => ({ label: it.name, id: it.id })),
+          ] : []}
+          onClick={item => jump(playlist.findIndex(it => it.id === item.id))}
+        />
       </div>
     </div>
   );
 }
 
 const Main: React.FC = () => {
-  const { app: { displayMode } } = useContext();
+  const { displayMode } = useApp();
   if (displayMode === "music") {
-    return <MusicList />
+    return <MusicList />;
   } else if (displayMode === "album") {
     return <AlbumList />;
   } else if (displayMode === "artist") {
@@ -197,10 +213,12 @@ interface MusicListState {
   selectedMusicId: string | null;
 }
 
+const client = new ApolloClient({ uri: "http://localhost:8080/graphql" });
+
 const MusicList: React.FC = () => {
   const [state, setState] = useState<MusicListState>({ selectedMusicId: null });
   const { loading, data, error } = useQuery<{ musics: MusicResult[] }>(MusicQuery);
-  const { player: { current, push } } = useContext();
+  const { current, push } = usePlayer();
   if (loading) {
     return <div>loading...</div>
   }
@@ -208,41 +226,37 @@ const MusicList: React.FC = () => {
     return <div>{error.message}{error.stack}</div>
   }
   return (
-    <>
-    <table style={{ width: "100%" }}>
+    <table className="table table-hover" style={{ width: "100%", height: "100%", userSelect: "none", marginBottom: 0 }}>
       <thead>
-        <tr style={{ fontSize: 12, userSelect: "none" }}>
-          <th>::</th><th>title</th><th>artist</th><th>album</th>
+        <tr>
+          <th style={{ width: 72, fontWeight: "bold", textAlign: "center" }}></th>
+          <th>title</th>
+          <th>artist</th>
+          <th>album</th>
         </tr>
       </thead>
       <tbody>
       {data?.musics.map(it =>
         <tr
           key={it.filePath}
-          style={{
-            cursor: "pointer",
-            fontSize: 12,
-            borderBottom: "1px solid #ccc",
-            backgroundColor: (state?.selectedMusicId === it.id ? "#eee" : "transparent"),
-          }}
+          className={classNames({ selected: state?.selectedMusicId === it.id })}
           onDoubleClick={() => push(it)}
           onClick={() => setState({ selectedMusicId: it.id })}
         >
-          <td style={{ userSelect: "none", width: 20, textAlign: "center" }} >{it.id === current?.id ? "♪" : ""}</td>
-          <td style={{ userSelect: "none", borderLeft: "1px solid #ccc", padding: "4px 8px" }}>{it.name}</td>
-          <td style={{ userSelect: "none", borderLeft: "1px solid #ccc", padding: "4px 8px" }}>{it.artist.name}</td>
-          <td style={{ userSelect: "none", borderLeft: "1px solid #ccc", padding: "4px 8px" }}>{it.album.name}</td>
+          <td style={{ textAlign: "center" }}>{it.id === current?.id ? "♪" : ""}</td>
+          <td>{it.name}</td>
+          <td>{it.artist.name}</td>
+          <td>{it.album.name}</td>
         </tr>
       )}
       </tbody>
     </table>
-    </>
   );
 }
 
 const AlbumList: React.FC = () => {
   const { loading, data, error } = useQuery<{ albums: AlbumResult[] }>(AlbumQuery);
-  const { player: { current } } = useContext();
+  const { current } = usePlayer();
   if (loading) {
     return <div>loading...</div>
   }

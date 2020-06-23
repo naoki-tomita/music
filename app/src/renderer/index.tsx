@@ -1,21 +1,18 @@
 import React from "react";
 import {render} from "react-dom";
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "@apollo/react-hooks";
 
 import { App } from "./App";
-import { StoreProvider } from "./Actions";
-
-const client = new ApolloClient({ uri: "http://localhost:8080/graphql" });
+import { AppProvider } from "./Actions/App";
+import { PlayerProvider } from "./Actions/Player";
 
 const app = document.createElement("div");
 document.body.append(app);
 
 render(
-  <ApolloProvider client={client}>
-    <StoreProvider>
+  <AppProvider>
+    <PlayerProvider>
       <App />
-    </StoreProvider>
-  </ApolloProvider>,
+    </PlayerProvider>
+  </AppProvider>,
   app
 );
