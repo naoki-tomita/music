@@ -26,6 +26,10 @@ const Grid = styled.div<{ width: number }>`
         grid-template-columns: ${({ width }) => width}px 1px 1fr;
         height: 100vh;
 `;
+const GridArea = styled.div<{ name: string }>`
+  grid-area: ${({ name }) => name};
+`;
+
 
 export const App: React.FC = () => {
   const [state, setState] = useState<{
@@ -61,8 +65,8 @@ export const App: React.FC = () => {
       onMouseMove={state.dragHorizontal ? onDrag : undefined}
       onMouseUp={state.dragHorizontal ? dragEnd : undefined}
     >
-      <div style={{ gridArea: "a" }}><Player /></div>
-      <div style={{ gridArea: "b" }}><Sidebar /></div>
+      <GridArea name="a"><Player /></GridArea>
+      <GridArea name="b"><Sidebar /></GridArea>
       <div className="slider-wrapper">
         <div onMouseDown={dragStart} className="slider"></div>
         <div onMouseDown={dragStart} className="slider-highlight"></div>
